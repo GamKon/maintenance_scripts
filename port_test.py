@@ -1,6 +1,3 @@
-# Usage: port_test.py example.com
-#        port_test.py --env PORT_TEST_ENDPOINTS --ports 22 80 443 3389 5985 5986
-
 #!/usr/bin/env python3
 
 import json
@@ -11,6 +8,7 @@ import sys
 from argparse import ArgumentParser
 from contextlib import closing
 from typing import Tuple, List, Set
+from urllib.parse import urlparse
 
 # 22(SSH) , 5985, 5986(WINRM), 3389(RDP) ports should be closed
 DEFAULT_PORT_LIST = {22, 5985, 5986, 3389}
@@ -20,7 +18,7 @@ def main(hosts, ports) -> bool:
     total_opened_ports = 0
     print("\nBegin Testing Ports\n")
     for host in hosts:
-        total_opened_ports += test_host(host, ports)
+        total_opened_ports += test_host(urlparse(host), ports)
     print("\nResults:")
     if total_opened_ports != 0:
         print(f"\n\033[31m[ FAIL ]\033[0m {total_opened_ports} opened port(s).")
@@ -32,6 +30,7 @@ def main(hosts, ports) -> bool:
 
 def test_host(host, ports) -> int:
     opened_ports = 0
+    host = host.netloc if host.netloc else host.path
     for port in ports:
         if test_port(host, port):
             opened_ports += 1

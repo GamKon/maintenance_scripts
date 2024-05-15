@@ -1,7 +1,7 @@
 #!/usr/local/bin/bash
 # This script cleans up old images in container registry based on age and a tag
 #
-# For aerodromedev:
+# For development registry it deletes images based on the following rules:
 # Delete all untagged images
 # Keep tagged images for 30 days
 # Keep latest tag for 6 month
@@ -32,8 +32,8 @@ for repository in "${repositories[@]}"; do
     #            az acr repository delete --name $registry --image $repository@${manifest[2]}
                 free_space=$(( $free_space + ${manifest[1]} ))
             fi
-        done 
-        
+        done
+
         echo "$(( $free_space/1024/1024 )) Mb will be freed in $repository"
         total_free_space=$(( $total_free_space + $free_space ))
         free_space=0
